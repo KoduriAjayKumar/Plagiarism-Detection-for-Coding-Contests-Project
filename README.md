@@ -20,7 +20,7 @@ In programming contests, identifying plagiarism manually is a significant challe
 ---
 
 ## 📖 Project Description
-This project is designed to automatically detect and flag cases of code plagiarism in coding contests by:
+This project is designed to automatically detect the copied code in coding contests by:
 - Scraping user submissions from HackerRank with **Selenium**.
 - Storing submission data in a **MySQL database**.
 - Using **Sentence Transformer** to compute similarities between codes.
@@ -38,7 +38,7 @@ To run this project, the following inputs are needed:
 
 ---
 
-## 🗂️ Explanation of Code Files
+## 🗂️ Code Explanation
 
 ### 1. `Selenium.py` - Web Scraping and Data Storage
 **Purpose**: Automates the process of logging into HackerRank, navigating to the submissions page, and scraping relevant data to store in a MySQL database.
@@ -48,9 +48,20 @@ To run this project, the following inputs are needed:
 - **Data Extraction**: Extracts `username`, `problem title`, `language`, `time`, `score`, and `source code`.
 - **Database Storage**: Inserts scraped data into the `CodeSubmissions` table in the MySQL database.
 
-**Snippet**:
-```python
-driver = webdriver.Chrome()
-driver.get("https://www.hackerrank.com/auth/login/google")
-# Automates the login and extraction process.
-cursor.execute("INSERT INTO CodeSubmissions (username, problem_title, language, time, score, source_code) VALUES (%s, %s, %s, %s, %s, %s)", data)
+
+### 2. MLPlaglarismCheck.py - Detecting Plagiarism
+**Purpose:** Retrieves user submissions from the database, compares their source codes using Sentence Transformer, and flags copied submissions based on a set threshold.
+
+**Functionality:**
+Data Retrieval: Queries(extracts) the CodeSubmissions table for the latest submission per user.
+- **Embedding Generation:** Transforms source codes into embeddings for similarity comparison.
+- **Similarity Check:** Compares code pairs and flags those exceeding the similarity threshold (e.g., 0.98).
+- **Result Storage:** Inserts details of flagged submissions into the CopiedSubmissions table.
+
+
+### 3. app.py - Flask Web Application for Display
+**Purpose:** Provides a web interface to display flagged plagiarism cases from the CopiedSubmissions table and shows the detailed code of each user when clicked.
+
+**Functionality:**
+- **Home Page (/):** Lists all flagged cases with username1, username2, and similarity_score.
+- **Details Page**(/details/<username>): Shows the source code for the specified user.
